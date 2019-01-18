@@ -18,54 +18,39 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 
 @Path("/game")
 public class GameController {
-	public static ArrayList<Game> games = new ArrayList<Game>();
+	public static Game game = new Game(7);
 	
 	@POST
-	@Path("/startGame") 
+	@Path("/check/{guess}/{hash}") 
 	@Produces(value={MediaType.TEXT_PLAIN})
-	public Response startGame() throws URISyntaxException{
-		Game game = new Game();
-		games.add(game);
-		
-		return Response.created(new URI("/games")).status(201).entity(game.getId().toString()).build();
-	}
-	
-	@PUT
-	@Path("/guess/{id}/{guess}")
-	@Produces(value={MediaType.APPLICATION_JSON})
-	public Response guess(@PathParam("id") String gameId, @PathParam("guess") String guess) throws Exception{
-		Game game = new Game();
-		boolean found = false;
-		for(Game g: games) {
-			if(g.getId().toString().equals(gameId)) {
-				game = g;
-				found = true;
-				break;
+	public Response check(@PathParam("guess") String guess, @PathParam("hash") String hash) throws URISyntaxException{
+		Response r;
+		if(game.checkHash(hash))
+		{
+			if(game.checkInput(guess)) {
+				r = Response.status(200).build();
+			} else {
+				r = Response.status(406).build(); 
 			}
+		} else 
+		{
+			r = Response.status(406).build();
 		}
-		if(!found) {
-			return Response.status(404).build();
-		}
-		
-		if(game.guess(guess) != 0) {
-			return Response.status(400).build();
-		}
-		
-		return Response.status(200).entity(game.toJSON(0)).build();
+		return r;
 	}
 	
 	@GET
-	@Path("/games")
+	@Path("/view")
 	@Produces(value={MediaType.APPLICATION_JSON})
-	public Response getGames() {
-		JSONArray arr = new JSONArray();
-		for(Game game : games) {
-			arr.add(game.toJSON(1));
-		}
+	public Response view() {
+		JSONObject arr = new JSONObject();
+		arr.put("length", game.getLength());
+		arr.put("hash", game.getHash());
 		
 		return Response.status(200).entity(arr).build();
 	}

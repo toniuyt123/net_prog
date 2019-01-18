@@ -29,7 +29,7 @@ public class Game {
 			input = "aaaaaaa";
 			MessageDigest md;
 			md = MessageDigest.getInstance("MD5");
-			hash = md.digest(bytesOfInput).toString();
+			hash = new String(md.digest(input.getBytes()));
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

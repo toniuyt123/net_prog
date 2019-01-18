@@ -38,7 +38,8 @@ public class IntegrationTest {
 					guess = "aaaaaaa";
 					MessageDigest md;
 					md = MessageDigest.getInstance("MD5");
-					hashM = md.digest(guess.getBytes()).toString();
+					hashM = new String(md.digest(guess.getBytes()), "UTF8");
+					System.out.println(hashM + " " +  hash);
 					if(hashM.equals(hash) && given().basePath(serverBaseAddress).post("check/" + guess + "/" + hashM)
 					.getStatusCode() == 200)
 					{
